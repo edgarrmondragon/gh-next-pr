@@ -13,3 +13,8 @@ gh extension install edgarrmondragon/gh-next-pr
 ```
 gh next-pr [owner/repo]
 ```
+
+## Acknowledgments
+
+- http://sichard.ca/ (https://github.com/ichard26/next-pr-number) for the idea
+- [Jakub Kuczys (@Jackenmen)](https://github.com/Jackenmen) for coming up with the GraphQL query used here
