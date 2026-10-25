@@ -26,6 +26,13 @@ type response struct {
 	} `json:"repository"`
 }
 
+type data struct {
+	LastDiscussion  int `json:"lastDiscussion"`
+	LastIssue       int `json:"lastIssue"`
+	LastPullRequest int `json:"lastPullRequest"`
+	NextNumber      int `json:"nextNumber"`
+}
+
 const nextNumberQuery = `query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     discussions(orderBy: {field: CREATED_AT, direction: DESC}, first: 1) { nodes { number } }
@@ -46,10 +53,10 @@ func fatal(err error) {
 	os.Exit(1)
 }
 
-func getNextNumber(repo repository.Repository) (int, error) {
+func getNextNumber(repo repository.Repository) (data, error) {
 	client, err := api.NewGraphQLClient(api.ClientOptions{Host: repo.Host})
 	if err != nil {
-		return 0, err
+		return data{}, err
 	}
 
 	vars := map[string]interface{}{"owner": repo.Owner, "name": repo.Name}
@@ -57,14 +64,16 @@ func getNextNumber(repo repository.Repository) (int, error) {
 	resp := &response{}
 	err = client.Do(nextNumberQuery, vars, resp)
 	if err != nil {
-		return 0, err
+		return data{}, err
 	}
 
-	return max(
-		lastNumber(resp.Repository.Discussions.Nodes),
-		lastNumber(resp.Repository.Issues.Nodes),
-		lastNumber(resp.Repository.PullRequests.Nodes),
-	) + 1, nil
+	data := data{
+		LastDiscussion:  lastNumber(resp.Repository.Discussions.Nodes),
+		LastIssue:       lastNumber(resp.Repository.Issues.Nodes),
+		LastPullRequest: lastNumber(resp.Repository.PullRequests.Nodes),
+	}
+	data.NextNumber = 1 + max(data.LastDiscussion, data.LastIssue, data.LastPullRequest)
+	return data, nil
 }
 
 func main() {
@@ -82,9 +91,9 @@ func main() {
 			fatal(err)
 		}
 	}
-	next, err := getNextNumber(repo)
+	data, err := getNextNumber(repo)
 	if err != nil {
 		fatal(err)
 	}
-	fmt.Println(next)
+       fmt.Println(data.NextNumber)
 }

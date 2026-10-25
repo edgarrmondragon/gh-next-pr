@@ -66,7 +66,7 @@ func TestNextPullRequest(t *testing.T) {
 
 	next, err := getNextNumber(repo)
 	assert.NoError(t, err)
-	assert.Equal(t, 1001, next)
+	assert.Equal(t, 1001, next.NextNumber)
 	assert.True(t, gock.IsDone(), "unmatched mocks: %v", gock.Pending())
 }
 
@@ -86,9 +86,9 @@ func TestNextPullRequestFreshRepo(t *testing.T) {
   }
 }`)
 
-	next, err := getNextNumber(repo)
+	data, err := getNextNumber(repo)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, next)
+	assert.Equal(t, 1, data.NextNumber)
 	assert.True(t, gock.IsDone(), "unmatched mocks: %v", gock.Pending())
 }
 
