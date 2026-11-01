@@ -3,7 +3,7 @@ module github.com/edgarrmondragon/gh-next-pr
 go 1.27.2
 
 require (
-	github.com/cli/go-gh/v2 v2.16.2
+	github.com/cli/go-gh/v2 v2.17.0
 	github.com/h2non/gock v1.2.0
 	github.com/stretchr/testify v1.12.1
 )
